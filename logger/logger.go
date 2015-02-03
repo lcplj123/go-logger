@@ -190,7 +190,7 @@ func (this *Logger) Debug(s ...interface{}) {
 	if this.level > DEBUG {
 		return
 	}
-	defer catchError()
+	defer this.catchError()
 	this.logObj.mu.Lock()
 	defer this.logObj.mu.Unlock()
 	this.logObj.lg.Output(2, fmt.Sprintln("debug:", s))
@@ -201,7 +201,7 @@ func (this *Logger) Info(s ...interface{}) {
 	if this.level > INFO {
 		return
 	}
-	defer catchError()
+	defer this.catchError()
 	this.logObj.mu.Lock()
 	defer this.logObj.mu.Unlock()
 	this.logObj.lg.Output(2, fmt.Sprintln("info:", s))
@@ -212,7 +212,7 @@ func (this *Logger) Warn(s ...interface{}) {
 	if this.level > WARN {
 		return
 	}
-	defer catchError()
+	defer this.catchError()
 	this.logObj.mu.Lock()
 	defer this.logObj.mu.Unlock()
 	this.logObj.lg.Output(2, fmt.Sprintln("warn:", s))
@@ -223,7 +223,7 @@ func (this *Logger) Error(s ...interface{}) {
 	if this.level > ERROR {
 		return
 	}
-	defer catchError()
+	defer this.catchError()
 	this.logObj.mu.Lock()
 	defer this.logObj.mu.Unlock()
 	this.logObj.lg.Output(2, fmt.Sprintln("error:", s))
@@ -234,7 +234,7 @@ func (this *Logger) Fatal(s ...interface{}) {
 	if this.level > FATAL {
 		return
 	}
-	defer catchError()
+	defer this.catchError()
 	this.logObj.mu.Lock()
 	defer this.logObj.mu.Unlock()
 	this.logObj.lg.Output(2, fmt.Sprintln("fatal:", s))
@@ -337,7 +337,12 @@ func (this *Logger) fileCheck() {
 		defer this.logObj.mu.Unlock()
 		this.rename()
 	}
+}
 
+func (this *Logger) catchError() {
+	if err := recover(); err != nil {
+		this.logObj.lg.Println("catchError:", err)
+	}
 }
 func getFileSize(path string) int64 {
 	f, e := os.Stat(path)
@@ -345,11 +350,4 @@ func getFileSize(path string) int64 {
 		return 0
 	}
 	return f.Size()
-}
-
-func catchError() {
-	if err := recover(); err != nil {
-		//log.Println("catchError:", err)
-		fmt.Println("catchError:", err)
-	}
 }
