@@ -11,7 +11,7 @@ log.SetConsole(false)  //设置是否是控制台输出，默认是true
 参数三： 日志的大小（其单位用最后一个参数标示出来）
 参数四： 最大日志文件个数
 
-log.SetRollFile(`./logs`,'mylog',15,10,logger.MB)  //设置文件大小轮转
+log.SetRollFile(`./logs`,`mylog.log`,15,10,logger.MB)  //设置文件大小轮转
 
 //日志文件日期轮转
 参数一： 日志的目录
