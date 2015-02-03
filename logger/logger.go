@@ -2,8 +2,6 @@ package logger
 
 import (
 	"fmt"
-	"io/ioutil"
-	"ioutil"
 	"log"
 	"os"
 	"runtime"
