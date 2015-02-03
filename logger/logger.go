@@ -182,7 +182,7 @@ func (this *Logger) Console(s ...interface{}) {
 			}
 		}
 		file = short
-		log.Println(file+":"+strconv.Itoa(line), s)
+		this.logObj.lg.Println(file+":"+strconv.Itoa(line), s)
 	}
 }
 
@@ -329,7 +329,7 @@ func (this *Logger) fileMonitor() {
 func (this *Logger) fileCheck() {
 	defer func() {
 		if err := recover(); err != nil {
-			log.Println(err)
+			this.logObj.lg.Println(err)
 		}
 	}()
 	if this.logObj != nil && this.isMustRename() {
