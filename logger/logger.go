@@ -110,6 +110,9 @@ func (this *Logger) SetRollFile(dir, name string, maxfilesize, maxfilecount uint
 		panic("Logger: SetRollFile error!")
 		return
 	}
+	if this.rollWay != _NULL {
+		return
+	}
 	this.maxFileCount = maxfilecount
 	this.maxFileSize = int64(maxfilesize) * unit
 	this.rollWay = _FILE
@@ -134,10 +137,13 @@ func (this *Logger) SetRollFile(dir, name string, maxfilesize, maxfilecount uint
 	go this.fileMonitor()
 }
 
-//目前限定只能是1天
+//目前限定只能是每隔一天
 func (this *Logger) SetRollDate(dir, name string, interval uint) {
 	if interval == 0 || dir == "" || name == "" {
 		panic("Logger: SetRollData error!")
+		return
+	}
+	if this.rollWay != _NULL {
 		return
 	}
 	this.rollWay = _DATE
@@ -184,9 +190,6 @@ func (this *Logger) Debug(s ...interface{}) {
 	if this.level > DEBUG {
 		return
 	}
-	if this.rollWay == _DATE {
-		this.fileCheck()
-	}
 	defer catchError()
 	this.logObj.mu.Lock()
 	defer this.logObj.mu.Unlock()
@@ -197,9 +200,6 @@ func (this *Logger) Debug(s ...interface{}) {
 func (this *Logger) Info(s ...interface{}) {
 	if this.level > INFO {
 		return
-	}
-	if this.rollWay == _DATE {
-		this.fileCheck()
 	}
 	defer catchError()
 	this.logObj.mu.Lock()
@@ -212,9 +212,6 @@ func (this *Logger) Warn(s ...interface{}) {
 	if this.level > WARN {
 		return
 	}
-	if this.rollWay == _DATE {
-		this.fileCheck()
-	}
 	defer catchError()
 	this.logObj.mu.Lock()
 	defer this.logObj.mu.Unlock()
@@ -225,9 +222,6 @@ func (this *Logger) Warn(s ...interface{}) {
 func (this *Logger) Error(s ...interface{}) {
 	if this.level > ERROR {
 		return
-	}
-	if this.rollWay == _DATE {
-		this.fileCheck()
 	}
 	defer catchError()
 	this.logObj.mu.Lock()
@@ -240,12 +234,9 @@ func (this *Logger) Fatal(s ...interface{}) {
 	if this.level > FATAL {
 		return
 	}
-	if this.rollWay == _DATE {
-		this.fileCheck()
-	}
 	defer catchError()
 	this.logObj.mu.Lock()
-	this.logObj.mu.Unlock()
+	defer this.logObj.mu.Unlock()
 	this.logObj.lg.Output(2, fmt.Sprintln("fatal:", s))
 	this.Console("fatal:", s)
 }
